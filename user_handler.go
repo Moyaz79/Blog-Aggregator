@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Moyaz79/Blog-Aggregator/internal/database"
+	"github.com/Moyaz79/Blog-Aggregator/internal/database/auth"
 	"github.com/google/uuid"
 )
 
@@ -31,6 +32,23 @@ func (apiCfg *apiConfig) createUserHandler(w http.ResponseWriter, r *http.Reques
 	})
 	if err != nil {
 		respondWtihError(w, 400, fmt.Sprintf("Couldn't create user: %v", err))
+		return
+	}
+
+	respondWtihJSON(w, 201, databaseUserToUser(user))
+}
+
+
+func (apiCfg *apiConfig) getUserHandler(w http.ResponseWriter, r *http.Request) {
+	apiKey, err := auth.GetAPIKey(r.Header)
+	if err != nil {
+		respondWtihError(w, 403, fmt.Sprintf("Auth error: %v", err))
+		return
+	}
+
+	user, err := apiCfg.DB.GetUserByAPIKey(r.Context(), apiKey)
+	if err != nil {
+		respondWtihError(w, 400, fmt.Sprintf("Couldn't get user: %v", err))
 		return
 	}
 
