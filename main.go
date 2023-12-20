@@ -67,6 +67,7 @@ func main() {
 	//this will convert the getUserHandler to the standard http handler 
 	v1Router.Get("/users", apiCfg.middlewareAuth(apiCfg.getUserHandler))
 	v1Router.Post("/feeds", apiCfg.middlewareAuth(apiCfg.createFeedHandler))
+	v1Router.Get("/feeds", apiCfg.getFeedHandler)
 
 	router.Mount("/v1", v1Router)
 
