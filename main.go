@@ -6,21 +6,23 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Moyaz79/Blog-Aggregator/internal/database"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 
-	_"github.com/lib/pq"
-
+	_ "github.com/lib/pq"
 )
-//struct that can be used on function as method 
+
+//struct that can be used on function as method
 type apiConfig struct {
 	DB *database.Queries
 }
 
 func main() {
+
 
 	// library for loading the env file
 	godotenv.Load(".env")
@@ -42,10 +44,12 @@ func main() {
 		log.Fatal("Can't connect to database")
 	}
 
-	
+	db := database.New(conn)
 	apiCfg := apiConfig {
-		DB: database.New(conn),
+		DB: db,
 	}
+
+	go startScraping(db, 10, time.Minute)
 
 	router := chi.NewRouter()
 
